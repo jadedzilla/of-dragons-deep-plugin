@@ -10,6 +10,10 @@ exports every fish you've caught as text you can copy and paste into a web track
 | `/dragonsdeep` | Opens the window (also available from the plugin installer's "Open" button) |
 | `/dragonsdeep copy` | Copies your caught fish to the clipboard without opening the window |
 
+While the in-game **Fish Guide** is open, an **Export caught fish** button sits on its top-right
+corner: one click copies your caught fish in your chosen format (`...` opens the full window).
+You can hide it with the *Show export button on the Fish Guide* option.
+
 In the window you can choose the format, include spearfishing, include uncaught fish
 (JSON/CSV only), hit **Refresh** after catching something new, and **Copy to clipboard**.
 

@@ -116,6 +116,13 @@ public sealed class MainWindow : Window
             changed = true;
         }
 
+        var showGuideButton = cfg.ShowFishGuideButton;
+        if (ImGui.Checkbox("Show export button on the Fish Guide", ref showGuideButton))
+        {
+            cfg.ShowFishGuideButton = showGuideButton;
+            changed = true;
+        }
+
         if (changed)
         {
             cfg.Save();

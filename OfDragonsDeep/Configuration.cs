@@ -17,6 +17,7 @@ public sealed class Configuration : IPluginConfiguration
     public ExportFormat Format { get; set; } = ExportFormat.Json;
     public bool IncludeUncaught { get; set; } = false;
     public bool IncludeSpearfishing { get; set; } = true;
+    public bool ShowFishGuideButton { get; set; } = true;
 
     public void Save() => Plugin.PluginInterface.SavePluginConfig(this);
 }

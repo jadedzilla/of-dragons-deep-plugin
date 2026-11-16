@@ -15,6 +15,7 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
     [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
+    [PluginService] internal static IGameGui GameGui { get; private set; } = null!;
     [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
     [PluginService] internal static IPluginLog Log { get; private set; } = null!;
 
@@ -29,6 +30,7 @@ public sealed class Plugin : IDalamudPlugin
 
         mainWindow = new MainWindow(this);
         windowSystem.AddWindow(mainWindow);
+        windowSystem.AddWindow(new FishGuideOverlay(this, mainWindow));
 
         CommandManager.AddHandler(Command, new CommandInfo(OnCommand)
         {
