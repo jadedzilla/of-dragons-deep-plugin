@@ -96,7 +96,6 @@ public sealed class MainWindow : Window
     public override void Draw()
     {
         var cfg = plugin.Configuration;
-        var changed = false;
 
         ImGui.SetNextItemWidth(220);
         if (ImGui.BeginCombo("Format", Exporter.FormatLabel(cfg.Format)))
@@ -106,11 +105,34 @@ public sealed class MainWindow : Window
                 if (ImGui.Selectable(Exporter.FormatLabel(f), f == cfg.Format))
                 {
                     cfg.Format = f;
-                    changed = true;
+                    cfg.Save();
+                    Refresh();
                 }
             }
             ImGui.EndCombo();
         }
+
+        if (ImGui.BeginTabBar("##tabs"))
+        {
+            if (ImGui.BeginTabItem("Fish"))
+            {
+                DrawFishTab(cfg);
+                ImGui.EndTabItem();
+            }
+
+            if (ImGui.BeginTabItem("Achievements"))
+            {
+                DrawAchievementsTab(cfg);
+                ImGui.EndTabItem();
+            }
+
+            ImGui.EndTabBar();
+        }
+    }
+
+    private void DrawFishTab(Configuration cfg)
+    {
+        var changed = false;
 
         var includeSpear = cfg.IncludeSpearfishing;
         if (ImGui.Checkbox("Include spearfishing", ref includeSpear))
@@ -155,11 +177,87 @@ public sealed class MainWindow : Window
 
         ImGui.TextWrapped(status);
         ImGui.Separator();
+        DrawReadOnlyText("##export", exportText);
+    }
 
-        // Read-only text box so the list can also be selected/copied by hand.
-        var text = exportText;
+    private int achievementRevision = -1;
+    private ExportFormat achievementFormat;
+    private string achievementText = string.Empty;
+    private string achievementStatus = string.Empty;
+
+    private void DrawAchievementsTab(Configuration cfg)
+    {
+        var tracker = plugin.Achievements;
+
+        if (!Plugin.ClientState.IsLoggedIn)
+        {
+            ImGui.TextWrapped("Log in to a character to read your achievements.");
+            return;
+        }
+
+        var includeProgress = cfg.IncludeAchievementProgress;
+        if (ImGui.Checkbox("Include progress for unfinished achievements", ref includeProgress))
+        {
+            cfg.IncludeAchievementProgress = includeProgress;
+            cfg.Save();
+        }
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip("Progress (e.g. 312/500) is asked from the server one achievement at a time, so loading takes a little longer.");
+
+        ImGui.BeginDisabled(tracker.IsBusy);
+        if (ImGui.Button(tracker.Entries.Count == 0 ? "Load achievements" : "Reload achievements"))
+        {
+            achievementStatus = string.Empty;
+            tracker.Start(cfg.IncludeAchievementProgress);
+        }
+        ImGui.EndDisabled();
+
+        ImGui.SameLine();
+        ImGui.BeginDisabled(tracker.Entries.Count == 0 || tracker.IsBusy);
+        if (ImGui.Button("Copy to clipboard##achievements"))
+        {
+            ImGui.SetClipboardText(achievementText);
+            achievementStatus = "Copied to the clipboard.";
+        }
+        ImGui.EndDisabled();
+
+        var entries = tracker.Entries;
+        if (tracker.IsBusy)
+            ImGui.TextUnformatted(entries.Count == 0
+                ? "Loading achievements..."
+                : $"Getting progress from the server... {tracker.ProgressRemaining} left");
+        else if (tracker.Error != null)
+            ImGui.TextWrapped(tracker.Error);
+        else if (entries.Count == 0)
+            ImGui.TextWrapped("Exports the Fisher achievements (including ocean fishing). Press Load achievements to start.");
+        else
+        {
+            var done = entries.Where(a => a.Complete).ToList();
+            ImGui.TextUnformatted(
+                $"Fisher achievements: {done.Count}/{entries.Count} complete, " +
+                $"{done.Sum(a => (int)a.Points)}/{entries.Sum(a => (int)a.Points)} points");
+        }
+
+        if (achievementStatus.Length > 0)
+            ImGui.TextUnformatted(achievementStatus);
+
+        if (achievementRevision != tracker.Revision || achievementFormat != cfg.Format)
+        {
+            achievementRevision = tracker.Revision;
+            achievementFormat = cfg.Format;
+            achievementText = entries.Count == 0 ? string.Empty : Exporter.ExportAchievements(entries, cfg.Format);
+        }
+
+        ImGui.Separator();
+        DrawReadOnlyText("##achievementExport", achievementText);
+    }
+
+    // Read-only text box so the export can also be selected/copied by hand.
+    private static void DrawReadOnlyText(string id, string value)
+    {
+        var text = value;
         ImGui.InputTextMultiline(
-            "##export",
+            id,
             ref text,
             Math.Max(text.Length + 1, 1024),
             new Vector2(-1, -1),

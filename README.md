@@ -33,6 +33,14 @@ You can hide it with the *Show export button on the Fish Guide* option.
 In the window you can choose the format, include spearfishing, include uncaught fish
 (JSON/CSV only), hit **Refresh** after catching something new, and **Copy to clipboard**.
 
+## Achievements
+
+The **Achievements** tab exports the game's *Fisher* achievement category (133 achievements,
+including ocean fishing): which are complete, points, and, if *Include progress* is ticked, the
+progress of unfinished ones (e.g. `312/500`). Progress is asked from the server one achievement at
+a time, so loading takes a few seconds. The same format picker applies: JSON, completed IDs, CSV
+(`id,name,points,complete,current,max`) or a `[x]` / `[ ]` checklist.
+
 ## Export formats
 
 All IDs are **Item sheet IDs** — the same IDs used by Teamcraft, Garland Tools, XIVAPI and

@@ -18,6 +18,7 @@ public sealed class Configuration : IPluginConfiguration
     public bool IncludeUncaught { get; set; } = false;
     public bool IncludeSpearfishing { get; set; } = true;
     public bool ShowFishGuideButton { get; set; } = true;
+    public bool IncludeAchievementProgress { get; set; } = true;
 
     public void Save() => Plugin.PluginInterface.SavePluginConfig(this);
 }

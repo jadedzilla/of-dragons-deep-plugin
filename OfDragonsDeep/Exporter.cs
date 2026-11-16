@@ -88,10 +88,56 @@ public static class Exporter
 
     private static string KindName(FishKind k) => k == FishKind.Fishing ? "fishing" : "spearfishing";
 
+    public static string ExportAchievements(IReadOnlyList<AchievementEntry> list, ExportFormat format)
+    {
+        return format switch
+        {
+            ExportFormat.Json => JsonSerializer.Serialize(new
+            {
+                source = "OfDragonsDeep",
+                version = 1,
+                exportedAt = DateTime.UtcNow.ToString("o"),
+                category = "Fisher",
+                completed = list.Count(a => a.Complete),
+                total = list.Count,
+                points = list.Where(a => a.Complete).Sum(a => (int)a.Points),
+                totalPoints = list.Sum(a => (int)a.Points),
+                achievements = list.Select(a => new
+                {
+                    id = a.Id,
+                    name = a.Name,
+                    points = a.Points,
+                    complete = a.Complete,
+                    current = a.Complete ? a.Max ?? a.Current : a.Current,
+                    max = a.Max,
+                }),
+            }, JsonOptions),
+            ExportFormat.IdList => string.Join(",", list.Where(a => a.Complete).Select(a => a.Id)),
+            ExportFormat.Csv => AchievementsCsv(list),
+            ExportFormat.NameList => string.Join("\n", list.Select(a =>
+                (a.Complete ? "[x] " : "[ ] ") + a.Name +
+                (!a.Complete && a.Current.HasValue && a.Max.HasValue ? $" ({a.Current}/{a.Max})" : ""))),
+            _ => throw new ArgumentOutOfRangeException(nameof(format)),
+        };
+    }
+
+    private static string AchievementsCsv(IReadOnlyList<AchievementEntry> list)
+    {
+        var sb = new StringBuilder("id,name,points,complete,current,max\n");
+        foreach (var a in list)
+            sb.Append(a.Id).Append(',')
+              .Append(CsvEscape(a.Name)).Append(',')
+              .Append(a.Points).Append(',')
+              .Append(a.Complete ? "true" : "false").Append(',')
+              .Append(a.Current?.ToString() ?? "").Append(',')
+              .Append(a.Max?.ToString() ?? "").Append('\n');
+        return sb.ToString();
+    }
+
     public static string FormatLabel(ExportFormat f) => f switch
     {
         ExportFormat.Json => "JSON",
-        ExportFormat.IdList => "Item IDs (comma separated)",
+        ExportFormat.IdList => "IDs (comma separated)",
         ExportFormat.Csv => "CSV",
         ExportFormat.NameList => "Names (one per line)",
         _ => f.ToString(),
