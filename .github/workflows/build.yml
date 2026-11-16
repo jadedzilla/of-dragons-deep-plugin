@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    env:
+      DALAMUD_HOME: ${{ github.workspace }}\dalamud
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Download Dalamud
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile latest.zip
+          Expand-Archive -Force latest.zip "$env:DALAMUD_HOME"
+
+      - name: Restore
+        run: dotnet restore OfDragonsDeep/OfDragonsDeep.csproj
+
+      - name: Build
+        run: dotnet build OfDragonsDeep/OfDragonsDeep.csproj -c Release --no-restore
+
+      - name: Upload plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: OfDragonsDeep
+          path: OfDragonsDeep/bin/Release/OfDragonsDeep/latest.zip
+          if-no-files-found: error
