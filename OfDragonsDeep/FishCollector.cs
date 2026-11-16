@@ -4,7 +4,7 @@ using System.Linq;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using Lumina.Excel.Sheets;
 
-namespace FishExporter;
+namespace OfDragonsDeep;
 
 public enum FishKind
 {

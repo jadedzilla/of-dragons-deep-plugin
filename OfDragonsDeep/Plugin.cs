@@ -3,13 +3,13 @@ using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
-using FishExporter.Windows;
+using OfDragonsDeep.Windows;
 
-namespace FishExporter;
+namespace OfDragonsDeep;
 
 public sealed class Plugin : IDalamudPlugin
 {
-    private const string Command = "/fishexport";
+    private const string Command = "/dragonsdeep";
 
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
@@ -20,7 +20,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public Configuration Configuration { get; }
 
-    private readonly WindowSystem windowSystem = new("FishExporter");
+    private readonly WindowSystem windowSystem = new("OfDragonsDeep");
     private readonly MainWindow mainWindow;
 
     public Plugin()
@@ -32,7 +32,7 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.AddHandler(Command, new CommandInfo(OnCommand)
         {
-            HelpMessage = "Open the fish exporter. \"/fishexport copy\" copies your caught fish straight to the clipboard.",
+            HelpMessage = "Open Of Dragons Deep. \"/dragonsdeep copy\" copies your caught fish straight to the clipboard.",
         });
 
         PluginInterface.UiBuilder.Draw += windowSystem.Draw;
@@ -53,9 +53,9 @@ public sealed class Plugin : IDalamudPlugin
         {
             mainWindow.Refresh();
             if (mainWindow.CopyToClipboard(out var count))
-                ChatGui.Print($"[FishExporter] Copied {count} caught fish to the clipboard.");
+                ChatGui.Print($"[Of Dragons Deep] Copied {count} caught fish to the clipboard.");
             else
-                ChatGui.PrintError("[FishExporter] Fish data isn't available yet. Make sure you're logged in.");
+                ChatGui.PrintError("[Of Dragons Deep] Fish data isn't available yet. Make sure you're logged in.");
             return;
         }
 

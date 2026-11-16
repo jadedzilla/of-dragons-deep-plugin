@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 
-namespace FishExporter;
+namespace OfDragonsDeep;
 
 public static class Exporter
 {
@@ -28,7 +28,7 @@ public static class Exporter
     {
         var payload = new
         {
-            source = "FishExporter",
+            source = "OfDragonsDeep",
             version = 1,
             exportedAt = DateTime.UtcNow.ToString("o"),
             fish = list.Select(f => includeUncaught

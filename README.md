@@ -1,4 +1,4 @@
-# Fish Exporter (Dalamud plugin)
+# Of Dragons Deep (Dalamud plugin)
 
 Reads your **Fishing Log** and **Spearfishing Log** straight from game memory and
 exports every fish you've caught as text you can copy and paste into a web tracker.
@@ -7,8 +7,8 @@ exports every fish you've caught as text you can copy and paste into a web track
 
 | Command | What it does |
 |---|---|
-| `/fishexport` | Opens the window (also available from the plugin installer's "Open" button) |
-| `/fishexport copy` | Copies your caught fish to the clipboard without opening the window |
+| `/dragonsdeep` | Opens the window (also available from the plugin installer's "Open" button) |
+| `/dragonsdeep copy` | Copies your caught fish to the clipboard without opening the window |
 
 In the window you can choose the format, include spearfishing, include uncaught fish
 (JSON/CSV only), hit **Refresh** after catching something new, and **Copy to clipboard**.
@@ -20,7 +20,7 @@ Universalis, so they're the safest key for a tracker.
 
 **JSON** (default)
 ```json
-{"source":"FishExporter","version":1,"exportedAt":"2026-11-16T10:00:00.0000000Z",
+{"source":"OfDragonsDeep","version":1,"exportedAt":"2026-11-16T10:00:00.0000000Z",
  "fish":[{"id":4869,"name":"Merlthor Goby","type":"fishing"}, ...]}
 ```
 With *Include uncaught* on, each entry also gets `"caught": true|false`.
@@ -60,7 +60,7 @@ dotnet build -c Release
 ```
 
 Then in game: `/xlsettings` → **Experimental** → add the full path to
-`FishExporter/bin/Release/FishExporter.dll` under *Dev Plugin Locations*, save, and enable
+`OfDragonsDeep/bin/Release/OfDragonsDeep.dll` under *Dev Plugin Locations*, save, and enable
 it from `/xlplugins` → **Dev Tools → Installed Dev Plugins**.
 
 ## How it works

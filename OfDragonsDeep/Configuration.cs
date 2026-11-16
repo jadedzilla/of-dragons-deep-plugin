@@ -1,6 +1,6 @@
 using Dalamud.Configuration;
 
-namespace FishExporter;
+namespace OfDragonsDeep;
 
 public enum ExportFormat
 {

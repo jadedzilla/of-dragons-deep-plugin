@@ -5,7 +5,7 @@ using System.Numerics;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface.Windowing;
 
-namespace FishExporter.Windows;
+namespace OfDragonsDeep.Windows;
 
 public sealed class MainWindow : Window
 {
@@ -16,7 +16,7 @@ public sealed class MainWindow : Window
     private string status = string.Empty;
 
     public MainWindow(Plugin plugin)
-        : base("Fish Exporter###FishExporterMain")
+        : base("Of Dragons Deep###OfDragonsDeepMain")
     {
         this.plugin = plugin;
         SizeConstraints = new WindowSizeConstraints
