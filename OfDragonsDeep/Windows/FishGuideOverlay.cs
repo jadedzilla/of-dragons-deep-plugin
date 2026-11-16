@@ -56,6 +56,16 @@ public sealed class FishGuideOverlay : Window
         ImGui.SetNextWindowPos(anchor, ImGuiCond.Always, new Vector2(1, 1));
     }
 
+    private void Copy(bool link)
+    {
+        mainWindow.Refresh();
+        var ok = link ? mainWindow.CopyLinkToClipboard(out var count) : mainWindow.CopyToClipboard(out count);
+        feedback = !ok ? "Fish data not ready"
+            : link ? $"Link copied ({count} fish)!"
+            : $"Copied {count} fish!";
+        feedbackUntil = DateTime.UtcNow.AddSeconds(3);
+    }
+
     public override void Draw()
     {
         if (DateTime.UtcNow < feedbackUntil)
@@ -66,16 +76,20 @@ public sealed class FishGuideOverlay : Window
         }
 
         if (ImGui.Button("Export caught fish"))
-        {
-            mainWindow.Refresh();
-            feedback = mainWindow.CopyToClipboard(out var count)
-                ? $"Copied {count} fish!"
-                : "Fish data not ready";
-            feedbackUntil = DateTime.UtcNow.AddSeconds(3);
-        }
+            ImGui.OpenPopup("OfDragonsDeepExportMenu");
 
-        if (ImGui.IsItemHovered())
-            ImGui.SetTooltip($"Copy your caught fish to the clipboard as {Exporter.FormatLabel(plugin.Configuration.Format)}.");
+        if (ImGui.BeginPopup("OfDragonsDeepExportMenu"))
+        {
+            if (ImGui.Selectable("Copy tracker link"))
+                Copy(link: true);
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip($"A link to {Exporter.TrackerUrl} that imports your caught fish when opened.");
+
+            if (ImGui.Selectable($"Copy as {Exporter.FormatLabel(plugin.Configuration.Format)}"))
+                Copy(link: false);
+
+            ImGui.EndPopup();
+        }
 
         ImGui.SameLine();
         if (ImGui.Button("..."))

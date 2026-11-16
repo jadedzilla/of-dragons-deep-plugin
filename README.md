@@ -9,9 +9,11 @@ exports every fish you've caught as text you can copy and paste into a web track
 |---|---|
 | `/dragonsdeep` | Opens the window (also available from the plugin installer's "Open" button) |
 | `/dragonsdeep copy` | Copies your caught fish to the clipboard without opening the window |
+| `/dragonsdeep link` | Copies a link to the [Of Dragons Deep tracker](https://jadedzilla.github.io/of-dragons-deep/) that imports your caught fish when opened |
 
 While the in-game **Fish Guide** is open, an **Export caught fish** button sits on its top-right
-corner: one click copies your caught fish in your chosen format (`...` opens the full window).
+corner. It offers **Copy tracker link** (open the link in your browser and the tracker imports your
+fish) or a copy in your chosen format (`...` opens the full window).
 You can hide it with the *Show export button on the Fish Guide* option.
 
 In the window you can choose the format, include spearfishing, include uncaught fish
@@ -34,6 +36,13 @@ With *Include uncaught* on, each entry also gets `"caught": true|false`.
 **CSV**: `id,name,type,caught` header followed by one row per fish.
 
 **Names**: one fish name per line (uses your client language).
+
+## Tracker link format
+
+`https://jadedzilla.github.io/of-dragons-deep/?import=1.<data>` where `<data>` is the caught fish's
+item IDs, sorted, stored as differences from the previous ID (LEB128 varints), compressed with raw
+DEFLATE and base64url-encoded without padding. A complete log is about 400 characters. In the
+browser: `DecompressionStream("deflate-raw")`, then read the varints and add them up.
 
 ## Importing in your web app
 

@@ -72,6 +72,17 @@ public sealed class MainWindow : Window
         return true;
     }
 
+    /// <summary>Copies a link that opens the Of Dragons Deep tracker and imports the caught fish.</summary>
+    public bool CopyLinkToClipboard(out int caughtCount)
+    {
+        caughtCount = fish?.Count(f => f.Caught) ?? 0;
+        if (fish == null)
+            return false;
+
+        ImGui.SetClipboardText(Exporter.TrackerLink(fish));
+        return true;
+    }
+
     private static string BuildSummary(List<FishEntry> fish)
     {
         var line = fish.Where(f => f.Kind == FishKind.Fishing).ToList();
@@ -135,6 +146,12 @@ public sealed class MainWindow : Window
         ImGui.SameLine();
         if (ImGui.Button("Copy to clipboard") && CopyToClipboard(out var count))
             status = $"Copied {count} caught fish to the clipboard.  ({BuildSummary(fish!)})";
+
+        ImGui.SameLine();
+        if (ImGui.Button("Copy tracker link") && CopyLinkToClipboard(out var linkCount))
+            status = $"Copied a link that imports {linkCount} caught fish into Of Dragons Deep. Paste it into your browser.";
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip(Exporter.TrackerUrl);
 
         ImGui.TextWrapped(status);
         ImGui.Separator();

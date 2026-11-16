@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -22,6 +24,38 @@ public static class Exporter
             ExportFormat.NameList => string.Join("\n", list.Where(f => f.Caught).Select(f => f.Name)),
             _ => throw new ArgumentOutOfRangeException(nameof(format)),
         };
+    }
+
+    public const string TrackerUrl = "https://jadedzilla.github.io/of-dragons-deep/";
+
+    /// <summary>
+    /// Builds a link that imports the caught fish into the Of Dragons Deep tracker:
+    /// <c>?import=1.&lt;base64url(deflate-raw(varint deltas of the sorted item ids))&gt;</c>.
+    /// A full log fits in roughly 400 characters.
+    /// </summary>
+    public static string TrackerLink(IEnumerable<FishEntry> fish)
+    {
+        var ids = fish.Where(f => f.Caught).Select(f => f.ItemId).Distinct().OrderBy(id => id);
+
+        using var buffer = new MemoryStream();
+        using (var deflate = new DeflateStream(buffer, CompressionLevel.SmallestSize, leaveOpen: true))
+        {
+            uint prev = 0;
+            foreach (var id in ids)
+            {
+                var delta = id - prev;
+                prev = id;
+                while (delta >= 0x80)
+                {
+                    deflate.WriteByte((byte)(delta & 0x7F | 0x80));
+                    delta >>= 7;
+                }
+                deflate.WriteByte((byte)delta);
+            }
+        }
+
+        var encoded = Convert.ToBase64String(buffer.ToArray()).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+        return $"{TrackerUrl}?import=1.{encoded}";
     }
 
     private static string ToJson(IReadOnlyList<FishEntry> list, bool includeUncaught)
