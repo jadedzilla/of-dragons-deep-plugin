@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <!-- Replaces the SDK's default packaging so the plugin icon goes into latest.zip. -->
+  <!--
+    Replaces the SDK's default packaging. The packager writes the manifest (OfDragonsDeep.json) but
+    leaves sub-folders out of its zip, so latest.zip is built here to include images/icon.png.
+  -->
   <Target Name="PackagePlugin" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
     <DalamudPackager ProjectDir="$(ProjectDir)"
                      OutputPath="$(OutputPath)"
                      AssemblyName="$(AssemblyName)"
-                     MakeZip="true"
-                     Include="OfDragonsDeep.dll;OfDragonsDeep.json;images\icon.png" />
+                     MakeZip="false" />
+
+    <PropertyGroup>
+      <PackageStaging>$(OutputPath)package-staging\</PackageStaging>
+    </PropertyGroup>
+    <RemoveDir Directories="$(PackageStaging)" />
+    <Copy SourceFiles="$(OutputPath)$(AssemblyName).dll;$(OutputPath)$(AssemblyName).json" DestinationFolder="$(PackageStaging)" />
+    <Copy SourceFiles="$(ProjectDir)images\icon.png" DestinationFolder="$(PackageStaging)images" />
+    <MakeDir Directories="$(OutputPath)$(AssemblyName)" />
+    <ZipDirectory SourceDirectory="$(PackageStaging)" DestinationFile="$(OutputPath)$(AssemblyName)\latest.zip" Overwrite="true" />
+    <RemoveDir Directories="$(PackageStaging)" />
   </Target>
 </Project>
