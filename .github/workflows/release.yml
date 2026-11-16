@@ -1,0 +1,96 @@
+name: Release
+
+# Run from the Actions tab: builds the plugin with the given version, publishes a GitHub release
+# with latest.zip, and updates repo.json (the Dalamud custom repository) on main.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version, e.g. 1.0.1 (four parts allowed: 1.0.1.0)"
+        required: true
+      changelog:
+        description: "What changed (shown in the plugin installer)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency: release
+
+jobs:
+  release:
+    runs-on: windows-latest
+    env:
+      DALAMUD_HOME: ${{ github.workspace }}\dalamud
+      VERSION: ${{ inputs.version }}
+      CHANGELOG: ${{ inputs.changelog }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Check version
+        shell: pwsh
+        run: |
+          if ($env:VERSION -notmatch '^\d+\.\d+\.\d+(\.\d+)?$') { throw "Version must look like 1.0.1 or 1.0.1.0" }
+          gh release view "v$env:VERSION" 2>$null
+          if ($LASTEXITCODE -eq 0) { throw "Release v$env:VERSION already exists" }
+          exit 0
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Download Dalamud
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile latest.zip
+          Expand-Archive -Force latest.zip "$env:DALAMUD_HOME"
+
+      - name: Build
+        run: dotnet build OfDragonsDeep/OfDragonsDeep.csproj -c Release -p:Version=${{ inputs.version }}
+
+      - name: Create GitHub release
+        shell: pwsh
+        run: |
+          $notes = if ($env:CHANGELOG) { $env:CHANGELOG } else { "Of Dragons Deep $env:VERSION" }
+          gh release create "v$env:VERSION" OfDragonsDeep/bin/Release/OfDragonsDeep/latest.zip `
+            --target main --title "v$env:VERSION" --notes $notes
+
+      - name: Update repo.json
+        shell: pwsh
+        run: |
+          $m = Get-Content OfDragonsDeep/bin/Release/OfDragonsDeep.json -Raw | ConvertFrom-Json
+          $zip = "https://github.com/${{ github.repository }}/releases/download/v$env:VERSION/latest.zip"
+          $entry = [ordered]@{
+            Author             = $m.Author
+            Name               = $m.Name
+            InternalName       = $m.InternalName
+            AssemblyVersion    = $m.AssemblyVersion
+            Punchline          = $m.Punchline
+            Description        = $m.Description
+            ApplicableVersion  = $m.ApplicableVersion
+            RepoUrl            = $m.RepoUrl
+            Tags               = $m.Tags
+            DalamudApiLevel    = $m.DalamudApiLevel
+            IconUrl            = $m.IconUrl
+            Changelog          = $env:CHANGELOG
+            IsHide             = $false
+            IsTestingExclusive = $false
+            DownloadCount      = 0
+            LastUpdate         = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+            DownloadLinkInstall = $zip
+            DownloadLinkUpdate  = $zip
+            DownloadLinkTesting = $zip
+          }
+          ConvertTo-Json -InputObject @($entry) -Depth 5 | Set-Content repo.json -Encoding utf8NoBOM
+          Get-Content repo.json
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add repo.json
+          git commit -m "Release v$env:VERSION"
+          git push origin HEAD:main

@@ -5,6 +5,20 @@ Exports the fish you have caught to the Of Dragons Deep website.
 It reads your **Fishing Log** and **Spearfishing Log** straight from game memory and
 exports every fish you've caught as text you can copy and paste into a web tracker.
 
+## Installing
+
+1. In game, type `/xlsettings` and open the **Experimental** tab.
+2. Under **Custom Plugin Repositories**, paste
+   `https://raw.githubusercontent.com/jadedzilla/of-dragons-deep-plugin/main/repo.json`,
+   click **+**, tick **Enabled**, and save.
+3. Open `/xlplugins`, search for **Of Dragons Deep** and install it.
+
+## Releasing a new version
+
+Actions tab → **Release** → *Run workflow*, enter a version higher than the last one (e.g. `1.0.1`)
+and optionally a changelog. The workflow builds the plugin, publishes a GitHub release with
+`latest.zip` and updates `repo.json`, so players get the update from the plugin installer.
+
 ## Usage
 
 | Command | What it does |
