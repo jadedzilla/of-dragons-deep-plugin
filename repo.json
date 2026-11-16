@@ -3,7 +3,7 @@
     "Author": "jadedzilla",
     "Name": "Of Dragons Deep",
     "InternalName": "OfDragonsDeep",
-    "AssemblyVersion": "1.1.0.0",
+    "AssemblyVersion": "1.2.0.0",
     "Punchline": "Exports the fish you have caught to the Of Dragons Deep website.",
     "Description": "Exports the fish you have caught to the Of Dragons Deep website.",
     "ApplicableVersion": "any",
@@ -16,13 +16,13 @@
     ],
     "DalamudApiLevel": 15,
     "IconUrl": "https://raw.githubusercontent.com/jadedzilla/of-dragons-deep-plugin/main/OfDragonsDeep/images/icon.png",
-    "Changelog": "Adds an Achievements tab that exports Fisher achievement completion and progress.",
+    "Changelog": "One export for everything: Copy tracker link and Copy JSON now include your caught fish and Fisher achievements (with progress). The separate formats and Achievements tab are replaced by these two buttons.",
     "IsHide": false,
     "IsTestingExclusive": false,
     "DownloadCount": 0,
-    "LastUpdate": 1794863038,
-    "DownloadLinkInstall": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.1.0/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.1.0/latest.zip",
-    "DownloadLinkTesting": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.1.0/latest.zip"
+    "LastUpdate": 1794872585,
+    "DownloadLinkInstall": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.2.0/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.2.0/latest.zip",
+    "DownloadLinkTesting": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.2.0/latest.zip"
   }
 ]
