@@ -21,7 +21,7 @@ public sealed class MainWindow : Window
         this.plugin = plugin;
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(420, 320),
+            MinimumSize = new Vector2(420, 180),
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue),
         };
     }
@@ -176,8 +176,6 @@ public sealed class MainWindow : Window
             ImGui.SetTooltip(Exporter.TrackerUrl);
 
         ImGui.TextWrapped(status);
-        ImGui.Separator();
-        DrawReadOnlyText("##export", exportText);
     }
 
     private int achievementRevision = -1;
@@ -248,19 +246,5 @@ public sealed class MainWindow : Window
             achievementText = entries.Count == 0 ? string.Empty : Exporter.ExportAchievements(entries, cfg.Format);
         }
 
-        ImGui.Separator();
-        DrawReadOnlyText("##achievementExport", achievementText);
-    }
-
-    // Read-only text box so the export can also be selected/copied by hand.
-    private static void DrawReadOnlyText(string id, string value)
-    {
-        var text = value;
-        ImGui.InputTextMultiline(
-            id,
-            ref text,
-            Math.Max(text.Length + 1, 1024),
-            new Vector2(-1, -1),
-            ImGuiInputTextFlags.ReadOnly);
     }
 }
