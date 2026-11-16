@@ -38,12 +38,15 @@ public sealed class Plugin : IDalamudPlugin
 
         PluginInterface.UiBuilder.Draw += windowSystem.Draw;
         PluginInterface.UiBuilder.OpenMainUi += mainWindow.Toggle;
+        // The options (format, spearfishing, Fish Guide button) live in the main window.
+        PluginInterface.UiBuilder.OpenConfigUi += mainWindow.Toggle;
     }
 
     public void Dispose()
     {
         PluginInterface.UiBuilder.Draw -= windowSystem.Draw;
         PluginInterface.UiBuilder.OpenMainUi -= mainWindow.Toggle;
+        PluginInterface.UiBuilder.OpenConfigUi -= mainWindow.Toggle;
         windowSystem.RemoveAllWindows();
         CommandManager.RemoveHandler(Command);
     }
