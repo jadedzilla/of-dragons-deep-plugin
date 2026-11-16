@@ -1,0 +1,72 @@
+# Fish Exporter (Dalamud plugin)
+
+Reads your **Fishing Log** and **Spearfishing Log** straight from game memory and
+exports every fish you've caught as text you can copy and paste into a web tracker.
+
+## Usage
+
+| Command | What it does |
+|---|---|
+| `/fishexport` | Opens the window (also available from the plugin installer's "Open" button) |
+| `/fishexport copy` | Copies your caught fish to the clipboard without opening the window |
+
+In the window you can choose the format, include spearfishing, include uncaught fish
+(JSON/CSV only), hit **Refresh** after catching something new, and **Copy to clipboard**.
+
+## Export formats
+
+All IDs are **Item sheet IDs** — the same IDs used by Teamcraft, Garland Tools, XIVAPI and
+Universalis, so they're the safest key for a tracker.
+
+**JSON** (default)
+```json
+{"source":"FishExporter","version":1,"exportedAt":"2026-11-16T10:00:00.0000000Z",
+ "fish":[{"id":4869,"name":"Merlthor Goby","type":"fishing"}, ...]}
+```
+With *Include uncaught* on, each entry also gets `"caught": true|false`.
+
+**Item IDs**: `4869,4870,4871,...`
+
+**CSV**: `id,name,type,caught` header followed by one row per fish.
+
+**Names**: one fish name per line (uses your client language).
+
+## Importing in your web app
+
+```js
+function parseFishExport(text) {
+  text = text.trim();
+  if (text.startsWith("{")) {
+    const data = JSON.parse(text);
+    return data.fish.filter(f => f.caught !== false).map(f => f.id);
+  }
+  if (text.startsWith("id,name")) {
+    return text.split("\n").slice(1).filter(Boolean)
+      .map(l => l.split(","))
+      .filter(c => c[c.length - 1] === "true")
+      .map(c => Number(c[0]));
+  }
+  return text.split(/[,\s]+/).filter(Boolean).map(Number); // plain ID list
+}
+```
+
+## Building
+
+Requirements: .NET 10 SDK and XIVLauncher with Dalamud installed (the build references
+your local Dalamud install, `%AppData%\XIVLauncher\addon\Hooks\dev`).
+
+```
+dotnet build -c Release
+```
+
+Then in game: `/xlsettings` → **Experimental** → add the full path to
+`FishExporter/bin/Release/FishExporter.dll` under *Dev Plugin Locations*, save, and enable
+it from `/xlplugins` → **Dev Tools → Installed Dev Plugins**.
+
+## How it works
+
+- `PlayerState.IsFishCaught(FishParameterId)` for every `FishParameter` row with `IsInLog`.
+- `PlayerState.IsSpearfishCaught(SpearfishingItemId)` for `SpearfishingItem` rows 20001–29999.
+- Fish rows are mapped to their `Item` row for the exported ID and name.
+
+The data is only read when you open the window or press Refresh. Nothing is sent anywhere.
