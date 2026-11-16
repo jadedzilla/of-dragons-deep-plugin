@@ -18,8 +18,6 @@ public sealed class FishGuideOverlay : Window
     private readonly MainWindow mainWindow;
 
     private Vector2 anchor;
-    private string feedback = string.Empty;
-    private DateTime feedbackUntil;
 
     public FishGuideOverlay(Plugin plugin, MainWindow mainWindow)
         : base("###OfDragonsDeepFishGuideOverlay",
@@ -56,37 +54,31 @@ public sealed class FishGuideOverlay : Window
         ImGui.SetNextWindowPos(anchor, ImGuiCond.Always, new Vector2(1, 1));
     }
 
-    private void Copy(bool link)
-    {
-        mainWindow.Refresh();
-        var ok = link ? mainWindow.CopyLinkToClipboard(out var count) : mainWindow.CopyToClipboard(out count);
-        feedback = !ok ? "Fish data not ready"
-            : link ? $"Link copied ({count} fish)!"
-            : $"Copied {count} fish!";
-        feedbackUntil = DateTime.UtcNow.AddSeconds(3);
-    }
-
     public override void Draw()
     {
-        if (DateTime.UtcNow < feedbackUntil)
+        var export = plugin.Export;
+        var showStatus = export.IsBusy || DateTime.UtcNow - export.StatusAt < TimeSpan.FromSeconds(4);
+        if (showStatus && export.Status.Length > 0)
         {
             ImGui.AlignTextToFramePadding();
-            ImGui.TextUnformatted(feedback);
+            ImGui.TextUnformatted(export.Status);
             ImGui.SameLine();
         }
 
-        if (ImGui.Button("Export caught fish"))
+        ImGui.BeginDisabled(export.IsBusy);
+        if (ImGui.Button("Export"))
             ImGui.OpenPopup("OfDragonsDeepExportMenu");
+        ImGui.EndDisabled();
 
         if (ImGui.BeginPopup("OfDragonsDeepExportMenu"))
         {
             if (ImGui.Selectable("Copy tracker link"))
-                Copy(link: true);
+                export.Copy(ExportKind.Link);
             if (ImGui.IsItemHovered())
-                ImGui.SetTooltip($"A link to {Exporter.TrackerUrl} that imports your caught fish when opened.");
+                ImGui.SetTooltip($"A link to {Exporter.TrackerUrl} that imports your fish and achievements.");
 
-            if (ImGui.Selectable($"Copy as {Exporter.FormatLabel(plugin.Configuration.Format)}"))
-                Copy(link: false);
+            if (ImGui.Selectable("Copy JSON"))
+                export.Copy(ExportKind.Json);
 
             ImGui.EndPopup();
         }
@@ -96,6 +88,6 @@ public sealed class FishGuideOverlay : Window
             mainWindow.IsOpen = true;
 
         if (ImGui.IsItemHovered())
-            ImGui.SetTooltip("Open Of Dragons Deep (format and options)");
+            ImGui.SetTooltip("Open Of Dragons Deep (options)");
     }
 }

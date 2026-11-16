@@ -33,6 +33,11 @@ public sealed class AchievementTracker : IDisposable
     private static readonly TimeSpan LoadTimeout = TimeSpan.FromSeconds(15);
     private static readonly TimeSpan ProgressTimeout = TimeSpan.FromSeconds(5);
     private static readonly TimeSpan ProgressSpacing = TimeSpan.FromMilliseconds(150);
+    /// <summary>Progress fetched from the server is reused for this long, so repeated exports are instant.</summary>
+    private static readonly TimeSpan ProgressMaxAge = TimeSpan.FromMinutes(10);
+
+    private readonly Dictionary<uint, (uint Current, uint Max)> progressCache = [];
+    private DateTime progressFetchedAt = DateTime.MinValue;
 
     private enum Phase { Idle, LoadingCompletion, LoadingProgress }
 
@@ -76,6 +81,8 @@ public sealed class AchievementTracker : IDisposable
 
     public void Reset()
     {
+        progressCache.Clear();
+        progressFetchedAt = DateTime.MinValue;
         phase = Phase.Idle;
         progressQueue.Clear();
         waitingFor = null;
@@ -126,8 +133,18 @@ public sealed class AchievementTracker : IDisposable
             Entries = BuildEntries(ach);
             Revision++;
 
-            if (withProgress)
+            if (withProgress && now - progressFetchedAt < ProgressMaxAge)
             {
+                foreach (var e in Entries.Where(e => !e.Complete))
+                {
+                    if (progressCache.TryGetValue(e.Id, out var p))
+                        (e.Current, e.Max) = (p.Current, p.Max);
+                }
+                phase = Phase.Idle;
+            }
+            else if (withProgress)
+            {
+                progressCache.Clear();
                 foreach (var e in Entries.Where(e => !e.Complete))
                     progressQueue.Enqueue(e);
                 phase = Phase.LoadingProgress;
@@ -147,6 +164,7 @@ public sealed class AchievementTracker : IDisposable
             {
                 waitingFor.Current = ach->ProgressCurrent;
                 waitingFor.Max = ach->ProgressMax;
+                progressCache[waitingFor.Id] = (ach->ProgressCurrent, ach->ProgressMax);
                 waitingFor = null;
                 nextRequestAt = now + ProgressSpacing;
                 Revision++;
@@ -161,6 +179,7 @@ public sealed class AchievementTracker : IDisposable
 
         if (progressQueue.Count == 0)
         {
+            progressFetchedAt = now;
             phase = Phase.Idle;
             return;
         }

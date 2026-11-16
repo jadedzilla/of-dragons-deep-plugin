@@ -25,65 +25,43 @@ and optionally a changelog. The workflow builds the plugin, publishes a GitHub r
 |---|---|
 | `/dragonsdeep` | Opens the window (also available from the plugin installer's "Open" button) |
 
-While the in-game **Fish Guide** is open, an **Export caught fish** button sits on its top-right
-corner. It offers **Copy tracker link** (open the link in your browser and the tracker fills in its Import dialog with your
-fish) or a copy in your chosen format (`...` opens the full window).
-You can hide it with the *Show export button on the Fish Guide* option.
+The window shows your fishing log and Fisher achievement totals and has two exports. Both contain
+**everything at once**: your caught fish (fishing log, plus spearfishing unless you untick it) and the
+game's *Fisher* achievements (133, including ocean fishing) with progress for unfinished ones.
 
-In the window you can choose the format, include spearfishing, include uncaught fish
-(JSON/CSV only), hit **Refresh** after catching something new, and **Copy to clipboard**.
+- **Copy tracker link**: paste it into your browser; the [tracker](https://jadedzilla.github.io/of-dragons-deep/)
+  opens its Import dialog with your fish and achievements filled in.
+- **Copy JSON**: the same data as one JSON string, to paste into the tracker's Import dialog or anywhere else.
 
-## Achievements
+While the in-game **Fish Guide** is open, an **Export** button on its top-right corner offers the same two
+choices (`...` opens the window). You can hide it with *Show export button on the Fish Guide*.
 
-The **Achievements** tab exports the game's *Fisher* achievement category (133 achievements,
-including ocean fishing): which are complete, points, and, if *Include progress* is ticked, the
-progress of unfinished ones (e.g. `312/500`). Progress is asked from the server one achievement at
-a time, so loading takes a few seconds. The same format picker applies: JSON, completed IDs, CSV
-(`id,name,points,complete,current,max`) or a `[x]` / `[ ]` checklist.
+Achievement progress (e.g. `312/500`) is asked from the server one achievement at a time, so the first
+export takes a few seconds; it's reused for 10 minutes. Untick *Include achievement progress* to skip it.
 
-## Export formats
+## JSON format
 
-All IDs are **Item sheet IDs** — the same IDs used by Teamcraft, Garland Tools, XIVAPI and
-Universalis, so they're the safest key for a tracker.
-
-**JSON** (default)
 ```json
-{"source":"OfDragonsDeep","version":1,"exportedAt":"2026-11-16T10:00:00.0000000Z",
- "fish":[{"id":4869,"name":"Merlthor Goby","type":"fishing"}, ...]}
+{"source":"OfDragonsDeep","version":2,"exportedAt":"2026-11-17T10:00:00.0000000Z",
+ "fish":[4776,4869,4870],
+ "achievements":[{"id":259,"complete":true},{"id":265,"complete":false,"current":12,"max":100}]}
 ```
-With *Include uncaught* on, each entry also gets `"caught": true|false`.
 
-**Item IDs**: `4869,4870,4871,...`
-
-**CSV**: `id,name,type,caught` header followed by one row per fish.
-
-**Names**: one fish name per line (uses your client language).
+`fish` are the caught fish's **Item sheet IDs** (the IDs Teamcraft, Garland Tools, XIVAPI and Universalis use).
+`achievements` lists every Fisher achievement by Achievement sheet ID; `current`/`max` appear for unfinished
+ones when progress is included. `achievements` is left out if they couldn't be loaded.
 
 ## Tracker link format
 
-`https://jadedzilla.github.io/of-dragons-deep/?import=1.<data>` where `<data>` is the caught fish's
-item IDs, sorted, stored as differences from the previous ID (LEB128 varints), compressed with raw
-DEFLATE and base64url-encoded without padding. A complete log is about 400 characters. In the
-browser: `DecompressionStream("deflate-raw")`, then read the varints and add them up.
+`https://jadedzilla.github.io/of-dragons-deep/?import=2.<data>`: `<data>` is base64url (no padding) of raw
+DEFLATE-compressed LEB128 varints:
 
-## Importing in your web app
+1. the number of caught fish, then their sorted item IDs as differences from the previous ID;
+2. if achievements are included: their number, then per achievement (sorted by ID) the ID difference and a
+   status: `0` not complete, `1` complete, `2` not complete followed by `current` and `max`.
 
-```js
-function parseFishExport(text) {
-  text = text.trim();
-  if (text.startsWith("{")) {
-    const data = JSON.parse(text);
-    return data.fish.filter(f => f.caught !== false).map(f => f.id);
-  }
-  if (text.startsWith("id,name")) {
-    return text.split("\n").slice(1).filter(Boolean)
-      .map(l => l.split(","))
-      .filter(c => c[c.length - 1] === "true")
-      .map(c => Number(c[0]));
-  }
-  return text.split(/[,\s]+/).filter(Boolean).map(Number); // plain ID list
-}
-```
+A complete log with all achievements is a few hundred characters. In the browser:
+`DecompressionStream("deflate-raw")`, then read the varints in order.
 
 ## Building
 

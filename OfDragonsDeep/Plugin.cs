@@ -21,6 +21,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public Configuration Configuration { get; }
     public AchievementTracker Achievements { get; }
+    public ExportService Export { get; }
 
     private readonly WindowSystem windowSystem = new("OfDragonsDeep");
     private readonly MainWindow mainWindow;
@@ -30,6 +31,7 @@ public sealed class Plugin : IDalamudPlugin
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
         Achievements = new AchievementTracker();
+        Export = new ExportService(this);
         mainWindow = new MainWindow(this);
         windowSystem.AddWindow(mainWindow);
         windowSystem.AddWindow(new FishGuideOverlay(this, mainWindow));
@@ -41,7 +43,7 @@ public sealed class Plugin : IDalamudPlugin
 
         PluginInterface.UiBuilder.Draw += windowSystem.Draw;
         PluginInterface.UiBuilder.OpenMainUi += mainWindow.Toggle;
-        // The options (format, spearfishing, Fish Guide button) live in the main window.
+        // The options live in the main window.
         PluginInterface.UiBuilder.OpenConfigUi += mainWindow.Toggle;
     }
 
@@ -52,6 +54,7 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenConfigUi -= mainWindow.Toggle;
         windowSystem.RemoveAllWindows();
         CommandManager.RemoveHandler(Command);
+        Export.Dispose();
         Achievements.Dispose();
     }
 
