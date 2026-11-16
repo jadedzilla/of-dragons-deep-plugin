@@ -112,7 +112,7 @@ public sealed class AchievementTracker : IDisposable
             if (!ach->IsLoaded())
             {
                 // Same request the game makes when the Achievements window is opened.
-                if (!requestedCompletion && ach->State == AchievementState.Invalid)
+                if (!requestedCompletion && ach->State == Achievement.AchievementState.Invalid)
                 {
                     ach->RequestCompletedAchievements();
                     requestedCompletion = true;
@@ -143,7 +143,7 @@ public sealed class AchievementTracker : IDisposable
         // Phase.LoadingProgress
         if (waitingFor != null)
         {
-            if (ach->ProgressAchievementId == waitingFor.Id && ach->ProgressRequestState == AchievementState.Loaded)
+            if (ach->ProgressAchievementId == waitingFor.Id && ach->ProgressRequestState == Achievement.AchievementState.Loaded)
             {
                 waitingFor.Current = ach->ProgressCurrent;
                 waitingFor.Max = ach->ProgressMax;
