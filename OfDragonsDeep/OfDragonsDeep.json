@@ -3,6 +3,7 @@
   "Name": "Of Dragons Deep",
   "Punchline": "Exports the fish you have caught to the Of Dragons Deep website.",
   "Description": "Exports the fish you have caught to the Of Dragons Deep website.",
+  "IconUrl": "https://raw.githubusercontent.com/jadedzilla/of-dragons-deep-plugin/main/OfDragonsDeep/images/icon.png",
   "ApplicableVersion": "any",
   "Tags": ["fishing", "fish", "export", "tracker"]
 }
