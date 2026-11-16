@@ -16,7 +16,6 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IDataManager DataManager { get; private set; } = null!;
     [PluginService] internal static IClientState ClientState { get; private set; } = null!;
     [PluginService] internal static IGameGui GameGui { get; private set; } = null!;
-    [PluginService] internal static IChatGui ChatGui { get; private set; } = null!;
     [PluginService] internal static IPluginLog Log { get; private set; } = null!;
 
     public Configuration Configuration { get; }
@@ -34,7 +33,7 @@ public sealed class Plugin : IDalamudPlugin
 
         CommandManager.AddHandler(Command, new CommandInfo(OnCommand)
         {
-            HelpMessage = "Open Of Dragons Deep. \"/dragonsdeep copy\" copies your caught fish; \"/dragonsdeep link\" copies a link that imports them into the tracker.",
+            HelpMessage = "Open Of Dragons Deep.",
         });
 
         PluginInterface.UiBuilder.Draw += windowSystem.Draw;
@@ -51,26 +50,6 @@ public sealed class Plugin : IDalamudPlugin
 
     private void OnCommand(string command, string args)
     {
-        if (args.Trim().Equals("link", System.StringComparison.OrdinalIgnoreCase))
-        {
-            mainWindow.Refresh();
-            if (mainWindow.CopyLinkToClipboard(out var count))
-                ChatGui.Print($"[Of Dragons Deep] Copied a tracker link with {count} caught fish. Paste it into your browser.");
-            else
-                ChatGui.PrintError("[Of Dragons Deep] Fish data isn't available yet. Make sure you're logged in.");
-            return;
-        }
-
-        if (args.Trim().Equals("copy", System.StringComparison.OrdinalIgnoreCase))
-        {
-            mainWindow.Refresh();
-            if (mainWindow.CopyToClipboard(out var count))
-                ChatGui.Print($"[Of Dragons Deep] Copied {count} caught fish to the clipboard.");
-            else
-                ChatGui.PrintError("[Of Dragons Deep] Fish data isn't available yet. Make sure you're logged in.");
-            return;
-        }
-
         mainWindow.Toggle();
     }
 }

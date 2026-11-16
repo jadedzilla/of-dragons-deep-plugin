@@ -1,8 +1,8 @@
 {
   "Author": "you",
   "Name": "Of Dragons Deep",
-  "Punchline": "Export the fish you've caught to a copyable list.",
-  "Description": "Reads your Fishing Log and Spearfishing Log and exports every caught fish as JSON, CSV, an ID list or a name list that you can paste into a web tracker.",
+  "Punchline": "Exports the fish you have caught to the Of Dragons Deep website.",
+  "Description": "Exports the fish you have caught to the Of Dragons Deep website.",
   "ApplicableVersion": "any",
   "Tags": ["fishing", "fish", "export", "tracker"]
 }

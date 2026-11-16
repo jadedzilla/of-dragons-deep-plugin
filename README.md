@@ -1,6 +1,8 @@
 # Of Dragons Deep (Dalamud plugin)
 
-Reads your **Fishing Log** and **Spearfishing Log** straight from game memory and
+Exports the fish you have caught to the Of Dragons Deep website.
+
+It reads your **Fishing Log** and **Spearfishing Log** straight from game memory and
 exports every fish you've caught as text you can copy and paste into a web tracker.
 
 ## Usage
@@ -8,11 +10,9 @@ exports every fish you've caught as text you can copy and paste into a web track
 | Command | What it does |
 |---|---|
 | `/dragonsdeep` | Opens the window (also available from the plugin installer's "Open" button) |
-| `/dragonsdeep copy` | Copies your caught fish to the clipboard without opening the window |
-| `/dragonsdeep link` | Copies a link to the [Of Dragons Deep tracker](https://jadedzilla.github.io/of-dragons-deep/) that imports your caught fish when opened |
 
 While the in-game **Fish Guide** is open, an **Export caught fish** button sits on its top-right
-corner. It offers **Copy tracker link** (open the link in your browser and the tracker imports your
+corner. It offers **Copy tracker link** (open the link in your browser and the tracker fills in its Import dialog with your
 fish) or a copy in your chosen format (`...` opens the full window).
 You can hide it with the *Show export button on the Fish Guide* option.
 
