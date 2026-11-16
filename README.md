@@ -25,7 +25,7 @@ and optionally a changelog. The workflow builds the plugin, publishes a GitHub r
 |---|---|
 | `/dragonsdeep` | Opens the window (also available from the plugin installer's "Open" button) |
 
-The window shows your fishing log and Fisher achievement totals and has two exports. Both contain
+The window shows your fishing log and fishing achievement totals and has two exports. Both contain
 **everything at once**: your caught fish (fishing log, plus spearfishing unless you untick it) and the
 game's *Fisher* achievements (133, including ocean fishing) with progress for unfinished ones.
 

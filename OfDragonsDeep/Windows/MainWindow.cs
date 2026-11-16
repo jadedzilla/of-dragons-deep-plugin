@@ -52,8 +52,8 @@ public sealed class MainWindow : Window
 
         var achievements = plugin.Achievements.Entries;
         ImGui.TextUnformatted(achievements.Count == 0
-            ? "Fisher achievements: loaded when you export"
-            : $"Fisher achievements: {achievements.Count(a => a.Complete)}/{achievements.Count} complete, " +
+            ? "Fishing achievements: loaded when you export"
+            : $"Fishing achievements: {achievements.Count(a => a.Complete)}/{achievements.Count} complete, " +
               $"{achievements.Where(a => a.Complete).Sum(a => (int)a.Points)}/{achievements.Sum(a => (int)a.Points)} points");
 
         ImGui.Spacing();
