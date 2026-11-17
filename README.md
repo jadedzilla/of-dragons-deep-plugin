@@ -25,21 +25,18 @@ and optionally a changelog. The workflow builds the plugin, publishes a GitHub r
 |---|---|
 | `/dragonsdeep` | Opens the window (also available from the plugin installer's "Open" button) |
 
-The window shows your fishing log and fishing achievement totals. Press **Export data** to collect
-**everything at once**: your caught fish (fishing log, plus spearfishing unless you untick it) and the
-game's *Fisher* achievements (133, including ocean fishing) with progress for unfinished ones. Once it's
-ready, three buttons appear:
+While the in-game **Fish Guide** is open, an **Export** button sits on its top-right corner (`...` opens
+the plugin window; hide the button with *Show export button on the Fish Guide*). The plugin window
+(`/dragonsdeep`) shows your fishing log and fishing achievement totals and has the same **Export** button.
 
-- **Open in browser**: opens the [tracker](https://jadedzilla.github.io/of-dragons-deep/) with its Import
-  dialog filled in; nothing to copy or paste.
-- **Copy tracker link**: the same link, to paste into a browser yourself.
+Export opens a small window with a progress bar while it collects **everything at once**: your caught
+fish (fishing log, plus spearfishing unless you untick it) and the game's *Fisher* achievements (133,
+including ocean fishing) with progress for unfinished ones. When it's done, three buttons appear:
+
+- **Copy link**: a link to the [tracker](https://jadedzilla.github.io/of-dragons-deep/) that opens its
+  Import dialog with your fish and achievements filled in.
+- **Open link**: opens that link in your browser straight away.
 - **Copy JSON**: the same data as one JSON string, to paste into the tracker's Import dialog or anywhere else.
-
-**Export again** collects fresh data (e.g. after catching more fish).
-
-While the in-game **Fish Guide** is open, an **Export data** button sits on its top-right corner. Once
-the data is ready it becomes **Export**, a menu with the same three choices plus *Export again*
-(`...` opens the window). You can hide it with *Show export button on the Fish Guide*.
 
 Achievement progress (e.g. `312/500`) is asked from the server one achievement at a time, so the first
 export takes a few seconds; it's reused for 10 minutes. Untick *Include achievement progress* to skip it.

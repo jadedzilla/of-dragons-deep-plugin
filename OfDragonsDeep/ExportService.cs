@@ -49,8 +49,28 @@ public sealed class ExportService : IDisposable
         }
 
         collecting = true;
+        Data = null;
         plugin.Achievements.Start(plugin.Configuration.IncludeAchievementProgress);
-        SetStatus("Collecting your fish and achievements...");
+        SetStatus(string.Empty);
+    }
+
+    /// <summary>Collection progress for the progress bar: 0..1 and a label.</summary>
+    public (float Fraction, string Label) Progress
+    {
+        get
+        {
+            var t = plugin.Achievements;
+            if (!collecting)
+                return (Data != null ? 1f : 0f, Data != null ? "Done" : "");
+            if (t.LoadingCompletion)
+                return (0.05f, "Loading achievements...");
+            if (t.ProgressTotal > 0)
+            {
+                var done = t.ProgressTotal - t.ProgressRemaining;
+                return (0.1f + 0.9f * done / t.ProgressTotal, $"Achievement progress {done}/{t.ProgressTotal}");
+            }
+            return (0.95f, "Reading your fishing log...");
+        }
     }
 
     /// <summary>Forget the collected export (e.g. after an option changed), so Export data has to run again.</summary>
@@ -116,12 +136,7 @@ public sealed class ExportService : IDisposable
 
         var tracker = plugin.Achievements;
         if (tracker.IsBusy)
-        {
-            Status = tracker.Entries.Count == 0
-                ? "Loading achievements..."
-                : $"Getting achievement progress from the server... {tracker.ProgressRemaining} left";
             return;
-        }
 
         collecting = false;
         RefreshFish();
@@ -144,8 +159,8 @@ public sealed class ExportService : IDisposable
             DateTime.Now);
 
         SetStatus(achievements != null
-            ? $"Ready: {summary}."
-            : $"Ready: {summary}. Achievements couldn't be loaded, so they're not included.");
+            ? string.Empty
+            : "Achievements couldn't be loaded, so only fish are included.");
     }
 
     private void SetStatus(string text)

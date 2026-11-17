@@ -54,6 +54,12 @@ public sealed class AchievementTracker : IDisposable
     public List<AchievementEntry> Entries { get; private set; } = [];
     public bool IsBusy => phase != Phase.Idle;
     public int ProgressRemaining => progressQueue.Count + (waitingFor != null ? 1 : 0);
+
+    /// <summary>How many progress requests this load makes (0 when progress is skipped or reused).</summary>
+    public int ProgressTotal { get; private set; }
+
+    /// <summary>True while waiting for the server to send which achievements are complete.</summary>
+    public bool LoadingCompletion => phase == Phase.LoadingCompletion;
     public string? Error { get; private set; }
 
     /// <summary>Increments whenever Entries change, so the UI knows to rebuild its export text.</summary>
@@ -75,6 +81,7 @@ public sealed class AchievementTracker : IDisposable
         Error = null;
         progressQueue.Clear();
         waitingFor = null;
+        ProgressTotal = 0;
         phase = Phase.LoadingCompletion;
         phaseStarted = DateTime.UtcNow;
     }
@@ -147,6 +154,7 @@ public sealed class AchievementTracker : IDisposable
                 progressCache.Clear();
                 foreach (var e in Entries.Where(e => !e.Complete))
                     progressQueue.Enqueue(e);
+                ProgressTotal = progressQueue.Count;
                 phase = Phase.LoadingProgress;
                 nextRequestAt = now;
             }

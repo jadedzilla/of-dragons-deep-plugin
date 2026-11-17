@@ -58,40 +58,10 @@ public sealed class MainWindow : Window
 
         ImGui.Spacing();
 
-        // Export: first collect, then the actions appear and work instantly on the collected data.
-        ImGui.BeginDisabled(export.IsBusy);
-        if (ImGui.Button(export.Data == null ? "Export data" : "Export again"))
-            export.Prepare();
-        ImGui.EndDisabled();
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            ImGui.SetTooltip(export.Data == null
-                ? "Collect your caught fish and fishing achievements."
-                : $"Collected at {export.Data.CollectedAt:t}. Collect again to pick up anything new.");
-
-        if (export.Data != null && !export.IsBusy)
-        {
-            ImGui.SameLine();
-            if (ImGui.Button("Open in browser"))
-                export.OpenInBrowser();
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Open the tracker with your fish and achievements ready to import.");
-
-            ImGui.SameLine();
-            if (ImGui.Button("Copy tracker link"))
-                export.CopyLink();
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip($"A link to {Exporter.TrackerUrl} that imports your fish and achievements.");
-
-            ImGui.SameLine();
-            if (ImGui.Button("Copy JSON"))
-                export.CopyJson();
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Your caught fish and achievements as one JSON string.");
-        }
-
-        // Auto-resizing window: plain text (wrapped text would have no width to wrap to).
-        if (export.Status.Length > 0)
-            ImGui.TextUnformatted(export.Status);
+        if (ImGui.Button("Export"))
+            plugin.ExportWindow.StartExport();
+        if (ImGui.IsItemHovered())
+            ImGui.SetTooltip("Collect your caught fish and fishing achievements, then copy or open the link.");
 
         ImGui.Separator();
 

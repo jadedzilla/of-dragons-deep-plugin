@@ -25,6 +25,7 @@ public sealed class Plugin : IDalamudPlugin
 
     private readonly WindowSystem windowSystem = new("OfDragonsDeep");
     private readonly MainWindow mainWindow;
+    public ExportWindow ExportWindow { get; }
 
     public Plugin()
     {
@@ -32,8 +33,10 @@ public sealed class Plugin : IDalamudPlugin
 
         Achievements = new AchievementTracker();
         Export = new ExportService(this);
+        ExportWindow = new ExportWindow(this);
         mainWindow = new MainWindow(this);
         windowSystem.AddWindow(mainWindow);
+        windowSystem.AddWindow(ExportWindow);
         windowSystem.AddWindow(new FishGuideOverlay(this, mainWindow));
 
         CommandManager.AddHandler(Command, new CommandInfo(OnCommand)
