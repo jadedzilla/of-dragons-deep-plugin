@@ -6,28 +6,25 @@ using Dalamud.Utility;
 
 namespace OfDragonsDeep;
 
-public enum ExportKind
-{
-    /// <summary>Copy the tracker link.</summary>
-    Link,
-    /// <summary>Copy the JSON string.</summary>
-    Json,
-    /// <summary>Open the tracker link in the browser (nothing is copied).</summary>
-    Open,
-}
+/// <summary>Everything collected by one Export data: the tracker link and the JSON, ready to use.</summary>
+public sealed record ExportData(string Link, string Json, string Summary, DateTime CollectedAt);
 
 /// <summary>
-/// Runs an export: refreshes achievements (completion is instant; progress is asked from the server and reused for
-/// 10 minutes), then copies the link or JSON on the next UI frame once everything is in.
+/// Export in two steps. <see cref="Prepare"/> collects the fish log and achievements (completion is instant;
+/// progress is asked from the server and reused for 10 minutes). Once <see cref="Data"/> is set, opening or
+/// copying the link and copying the JSON are instant.
 /// </summary>
 public sealed class ExportService : IDisposable
 {
     private readonly Plugin plugin;
-    private ExportKind? pending;
+    private bool collecting;
 
     public string Status { get; private set; } = string.Empty;
     public DateTime StatusAt { get; private set; }
-    public bool IsBusy => pending != null;
+    public bool IsBusy => collecting;
+
+    /// <summary>The collected export, or null until Export data has finished.</summary>
+    public ExportData? Data { get; private set; }
 
     /// <summary>Fish read during the last export or <see cref="RefreshFish"/>; null if unavailable.</summary>
     public List<FishEntry>? Fish { get; private set; }
@@ -40,10 +37,10 @@ public sealed class ExportService : IDisposable
 
     public void Dispose() => Plugin.PluginInterface.UiBuilder.Draw -= OnDraw;
 
-    /// <summary>Starts an export: copies the link or JSON, or opens the link, once everything is collected.</summary>
-    public void Copy(ExportKind kind)
+    /// <summary>Starts collecting fish and achievements; <see cref="Data"/> is set when done.</summary>
+    public void Prepare()
     {
-        if (IsBusy)
+        if (collecting)
             return;
         if (!Plugin.ClientState.IsLoggedIn)
         {
@@ -51,9 +48,40 @@ public sealed class ExportService : IDisposable
             return;
         }
 
-        pending = kind;
+        collecting = true;
         plugin.Achievements.Start(plugin.Configuration.IncludeAchievementProgress);
         SetStatus("Collecting your fish and achievements...");
+    }
+
+    /// <summary>Forget the collected export (e.g. after an option changed), so Export data has to run again.</summary>
+    public void Discard()
+    {
+        Data = null;
+        Status = string.Empty;
+    }
+
+    public void OpenInBrowser()
+    {
+        if (Data == null)
+            return;
+        Util.OpenLink(Data.Link);
+        SetStatus($"Opened the tracker with {Data.Summary}.");
+    }
+
+    public void CopyLink()
+    {
+        if (Data == null)
+            return;
+        ImGui.SetClipboardText(Data.Link);
+        SetStatus($"Copied a tracker link with {Data.Summary}.");
+    }
+
+    public void CopyJson()
+    {
+        if (Data == null)
+            return;
+        ImGui.SetClipboardText(Data.Json);
+        SetStatus($"Copied JSON with {Data.Summary}.");
     }
 
     public void RefreshFish()
@@ -71,7 +99,19 @@ public sealed class ExportService : IDisposable
 
     private void OnDraw()
     {
-        if (pending is not { } kind)
+        if (!Plugin.ClientState.IsLoggedIn)
+        {
+            // Another character's data must not be exported.
+            if (Data != null || collecting)
+            {
+                Data = null;
+                collecting = false;
+                Status = string.Empty;
+            }
+            return;
+        }
+
+        if (!collecting)
             return;
 
         var tracker = plugin.Achievements;
@@ -83,7 +123,7 @@ public sealed class ExportService : IDisposable
             return;
         }
 
-        pending = null;
+        collecting = false;
         RefreshFish();
         if (Fish == null)
         {
@@ -93,26 +133,19 @@ public sealed class ExportService : IDisposable
 
         var achievements = tracker.Error == null && tracker.Entries.Count > 0 ? tracker.Entries : null;
         var fishCount = Fish.Count(f => f.Caught);
-        var contents = achievements != null
+        var summary = achievements != null
             ? $"{fishCount} fish and {achievements.Count(a => a.Complete)}/{achievements.Count} achievements"
             : $"{fishCount} fish";
-        var note = achievements != null ? "" : " Achievements couldn't be loaded, so they're not included.";
 
-        switch (kind)
-        {
-            case ExportKind.Open:
-                Util.OpenLink(Exporter.TrackerLink(Fish, achievements));
-                SetStatus($"Opened the tracker with {contents}.{note}");
-                break;
-            case ExportKind.Link:
-                ImGui.SetClipboardText(Exporter.TrackerLink(Fish, achievements));
-                SetStatus($"Copied a tracker link with {contents}.{note}");
-                break;
-            default:
-                ImGui.SetClipboardText(Exporter.ToJson(Fish, achievements));
-                SetStatus($"Copied JSON with {contents}.{note}");
-                break;
-        }
+        Data = new ExportData(
+            Exporter.TrackerLink(Fish, achievements),
+            Exporter.ToJson(Fish, achievements),
+            summary,
+            DateTime.Now);
+
+        SetStatus(achievements != null
+            ? $"Ready: {summary}."
+            : $"Ready: {summary}. Achievements couldn't be loaded, so they're not included.");
     }
 
     private void SetStatus(string text)

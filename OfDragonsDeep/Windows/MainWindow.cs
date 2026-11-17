@@ -58,26 +58,36 @@ public sealed class MainWindow : Window
 
         ImGui.Spacing();
 
-        // Export
+        // Export: first collect, then the actions appear and work instantly on the collected data.
         ImGui.BeginDisabled(export.IsBusy);
-        if (ImGui.Button("Copy tracker link"))
-            export.Copy(ExportKind.Link);
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            ImGui.SetTooltip($"A link to {Exporter.TrackerUrl} that imports your fish and achievements.");
-
-        ImGui.SameLine();
-        if (ImGui.Button("Open in browser"))
-            export.Copy(ExportKind.Open);
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            ImGui.SetTooltip("Open the tracker with your fish and achievements ready to import.");
-
-        ImGui.SameLine();
-        if (ImGui.Button("Copy JSON"))
-            export.Copy(ExportKind.Json);
-        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
-            ImGui.SetTooltip("Your caught fish and achievements as one JSON string.");
+        if (ImGui.Button(export.Data == null ? "Export data" : "Export again"))
+            export.Prepare();
         ImGui.EndDisabled();
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+            ImGui.SetTooltip(export.Data == null
+                ? "Collect your caught fish and fishing achievements."
+                : $"Collected at {export.Data.CollectedAt:t}. Collect again to pick up anything new.");
 
+        if (export.Data != null && !export.IsBusy)
+        {
+            ImGui.SameLine();
+            if (ImGui.Button("Open in browser"))
+                export.OpenInBrowser();
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Open the tracker with your fish and achievements ready to import.");
+
+            ImGui.SameLine();
+            if (ImGui.Button("Copy tracker link"))
+                export.CopyLink();
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip($"A link to {Exporter.TrackerUrl} that imports your fish and achievements.");
+
+            ImGui.SameLine();
+            if (ImGui.Button("Copy JSON"))
+                export.CopyJson();
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Your caught fish and achievements as one JSON string.");
+        }
 
         // Auto-resizing window: plain text (wrapped text would have no width to wrap to).
         if (export.Status.Length > 0)
@@ -92,6 +102,7 @@ public sealed class MainWindow : Window
             cfg.IncludeSpearfishing = includeSpear;
             cfg.Save();
             export.RefreshFish();
+            export.Discard(); // collected data no longer matches the options
         }
 
         var includeProgress = cfg.IncludeAchievementProgress;
@@ -99,6 +110,7 @@ public sealed class MainWindow : Window
         {
             cfg.IncludeAchievementProgress = includeProgress;
             cfg.Save();
+            export.Discard();
         }
         if (ImGui.IsItemHovered())
             ImGui.SetTooltip("Progress like 312/500 for unfinished achievements. It's asked from the server one\n" +

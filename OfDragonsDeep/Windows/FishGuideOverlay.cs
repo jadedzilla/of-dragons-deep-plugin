@@ -65,25 +65,39 @@ public sealed class FishGuideOverlay : Window
             ImGui.SameLine();
         }
 
-        ImGui.BeginDisabled(export.IsBusy);
-        if (ImGui.Button("Export"))
-            ImGui.OpenPopup("OfDragonsDeepExportMenu");
-        ImGui.EndDisabled();
+        if (export.Data == null || export.IsBusy)
+        {
+            ImGui.BeginDisabled(export.IsBusy);
+            if (ImGui.Button("Export data"))
+                export.Prepare();
+            ImGui.EndDisabled();
+        }
+        else
+        {
+            if (ImGui.Button("Export"))
+                ImGui.OpenPopup("OfDragonsDeepExportMenu");
+        }
 
         if (ImGui.BeginPopup("OfDragonsDeepExportMenu"))
         {
             if (ImGui.Selectable("Open in browser"))
-                export.Copy(ExportKind.Open);
+                export.OpenInBrowser();
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip("Open the tracker with your fish and achievements ready to import.");
 
             if (ImGui.Selectable("Copy tracker link"))
-                export.Copy(ExportKind.Link);
+                export.CopyLink();
             if (ImGui.IsItemHovered())
                 ImGui.SetTooltip($"A link to {Exporter.TrackerUrl} that imports your fish and achievements.");
 
             if (ImGui.Selectable("Copy JSON"))
-                export.Copy(ExportKind.Json);
+                export.CopyJson();
+
+            ImGui.Separator();
+            if (ImGui.Selectable("Export again"))
+                export.Prepare();
+            if (ImGui.IsItemHovered() && export.Data != null)
+                ImGui.SetTooltip($"Collected at {export.Data.CollectedAt:t}. Collect again to pick up anything new.");
 
             ImGui.EndPopup();
         }
