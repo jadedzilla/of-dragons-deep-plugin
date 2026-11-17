@@ -3,7 +3,7 @@
     "Author": "jadedzilla",
     "Name": "Of Dragons Deep",
     "InternalName": "OfDragonsDeep",
-    "AssemblyVersion": "1.2.2.0",
+    "AssemblyVersion": "1.2.3.0",
     "Punchline": "Exports the fish you have caught to the Of Dragons Deep website.",
     "Description": "Exports the fish you have caught to the Of Dragons Deep website.",
     "ApplicableVersion": "any",
@@ -16,13 +16,13 @@
     ],
     "DalamudApiLevel": 15,
     "IconUrl": "https://raw.githubusercontent.com/jadedzilla/of-dragons-deep-plugin/main/OfDragonsDeep/images/icon.png",
-    "Changelog": "New export flow: click Export on the Fish Guide (or in the plugin window), watch the progress bar while your fish and achievements are collected, then Copy link, Open link (opens the tracker in your browser) or Copy JSON. The plugin window now sizes itself to its content.",
+    "Changelog": "Tracker links now go to the new address, ofdragonsdeep.jadedzilla.com.",
     "IsHide": false,
     "IsTestingExclusive": false,
     "DownloadCount": 0,
-    "LastUpdate": 1794877406,
-    "DownloadLinkInstall": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.2.2/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.2.2/latest.zip",
-    "DownloadLinkTesting": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.2.2/latest.zip"
+    "LastUpdate": 1794879772,
+    "DownloadLinkInstall": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.2.3/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.2.3/latest.zip",
+    "DownloadLinkTesting": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.2.3/latest.zip"
   }
 ]
