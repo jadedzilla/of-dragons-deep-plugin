@@ -33,7 +33,7 @@ Export opens a small window with a progress bar while it collects **everything a
 fish (fishing log, plus spearfishing unless you untick it) and the game's *Fisher* achievements (133,
 including ocean fishing) with progress for unfinished ones. When it's done, three buttons appear:
 
-- **Copy link**: a link to the [tracker](https://jadedzilla.github.io/of-dragons-deep/) that opens its
+- **Copy link**: a link to the [tracker](https://ofdragonsdeep.jadedzilla.com/) that opens its
   Import dialog with your fish and achievements filled in.
 - **Open link**: opens that link in your browser straight away.
 - **Copy JSON**: the same data as one JSON string, to paste into the tracker's Import dialog or anywhere else.
@@ -55,7 +55,7 @@ ones when progress is included. `achievements` is left out if they couldn't be l
 
 ## Tracker link format
 
-`https://jadedzilla.github.io/of-dragons-deep/?import=2.<data>`: `<data>` is base64url (no padding) of raw
+`https://ofdragonsdeep.jadedzilla.com/?import=2.<data>`: `<data>` is base64url (no padding) of raw
 DEFLATE-compressed LEB128 varints:
 
 1. the number of caught fish, then their sorted item IDs as differences from the previous ID;

@@ -13,7 +13,7 @@ namespace OfDragonsDeep;
 /// </summary>
 public static class Exporter
 {
-    public const string TrackerUrl = "https://jadedzilla.github.io/of-dragons-deep/";
+    public const string TrackerUrl = "https://ofdragonsdeep.jadedzilla.com/";
 
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
