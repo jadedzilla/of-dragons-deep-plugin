@@ -31,6 +31,7 @@ game's *Fisher* achievements (133, including ocean fishing) with progress for un
 
 - **Copy tracker link**: paste it into your browser; the [tracker](https://jadedzilla.github.io/of-dragons-deep/)
   opens its Import dialog with your fish and achievements filled in.
+  After copying, **Open in browser** opens that link straight away.
 - **Copy JSON**: the same data as one JSON string, to paste into the tracker's Import dialog or anywhere else.
 
 While the in-game **Fish Guide** is open, an **Export** button on its top-right corner offers the same two

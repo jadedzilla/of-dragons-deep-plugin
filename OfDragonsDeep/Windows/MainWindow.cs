@@ -11,15 +11,15 @@ public sealed class MainWindow : Window
     private readonly Plugin plugin;
 
     public MainWindow(Plugin plugin)
-        : base("Of Dragons Deep###OfDragonsDeepMain")
+        : base("Of Dragons Deep###OfDragonsDeepMain", ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoResize)
     {
         this.plugin = plugin;
-        SizeConstraints = new WindowSizeConstraints
-        {
-            MinimumSize = new Vector2(420, 200),
-            MaximumSize = new Vector2(float.MaxValue, float.MaxValue),
-        };
     }
+
+    // Window sized to its content, with a little more breathing room than the default padding.
+    public override void PreDraw() => ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, new Vector2(14, 12));
+
+    public override void PostDraw() => ImGui.PopStyleVar();
 
     public override void OnOpen() => plugin.Export.RefreshFish();
 
@@ -30,7 +30,7 @@ public sealed class MainWindow : Window
 
         if (!Plugin.ClientState.IsLoggedIn)
         {
-            ImGui.TextWrapped("Log in to a character to export your fish and achievements.");
+            ImGui.TextUnformatted("Log in to a character to export your fish and achievements.");
             return;
         }
 
@@ -72,8 +72,18 @@ public sealed class MainWindow : Window
             ImGui.SetTooltip("Your caught fish and achievements as one JSON string.");
         ImGui.EndDisabled();
 
+        if (export.LastLink != null)
+        {
+            ImGui.SameLine();
+            if (ImGui.Button("Open in browser"))
+                export.OpenLastLink();
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Open the tracker link you copied, to import it.");
+        }
+
+        // Auto-resizing window: plain text (wrapped text would have no width to wrap to).
         if (export.Status.Length > 0)
-            ImGui.TextWrapped(export.Status);
+            ImGui.TextUnformatted(export.Status);
 
         ImGui.Separator();
 

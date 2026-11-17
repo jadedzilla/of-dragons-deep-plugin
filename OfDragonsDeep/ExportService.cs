@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Bindings.ImGui;
+using Dalamud.Utility;
 
 namespace OfDragonsDeep;
 
@@ -24,6 +25,9 @@ public sealed class ExportService : IDisposable
     public DateTime StatusAt { get; private set; }
     public bool IsBusy => pending != null;
 
+    /// <summary>The last tracker link copied, so it can be opened in the browser.</summary>
+    public string? LastLink { get; private set; }
+
     /// <summary>Fish read during the last export or <see cref="RefreshFish"/>; null if unavailable.</summary>
     public List<FishEntry>? Fish { get; private set; }
 
@@ -41,6 +45,7 @@ public sealed class ExportService : IDisposable
             return;
         if (!Plugin.ClientState.IsLoggedIn)
         {
+            LastLink = null;
             SetStatus("Log in to a character first.");
             return;
         }
@@ -86,15 +91,25 @@ public sealed class ExportService : IDisposable
         }
 
         var achievements = tracker.Error == null && tracker.Entries.Count > 0 ? tracker.Entries : null;
-        ImGui.SetClipboardText(kind == ExportKind.Link
+        var text = kind == ExportKind.Link
             ? Exporter.TrackerLink(Fish, achievements)
-            : Exporter.ToJson(Fish, achievements));
+            : Exporter.ToJson(Fish, achievements);
+        ImGui.SetClipboardText(text);
+        if (kind == ExportKind.Link)
+            LastLink = text;
 
         var what = kind == ExportKind.Link ? "Copied a tracker link" : "Copied JSON";
         var fishCount = Fish.Count(f => f.Caught);
         SetStatus(achievements != null
             ? $"{what} with {fishCount} fish and {achievements.Count(a => a.Complete)}/{achievements.Count} achievements."
             : $"{what} with {fishCount} fish. Achievements couldn't be loaded, so they're not included.");
+    }
+
+    /// <summary>Opens the last copied tracker link in the default browser.</summary>
+    public void OpenLastLink()
+    {
+        if (LastLink != null)
+            Util.OpenLink(LastLink);
     }
 
     private void SetStatus(string text)
