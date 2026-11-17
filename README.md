@@ -25,16 +25,16 @@ and optionally a changelog. The workflow builds the plugin, publishes a GitHub r
 |---|---|
 | `/dragonsdeep` | Opens the window (also available from the plugin installer's "Open" button) |
 
-The window shows your fishing log and fishing achievement totals and has two exports. Both contain
+The window shows your fishing log and fishing achievement totals and has three ways to export. All contain
 **everything at once**: your caught fish (fishing log, plus spearfishing unless you untick it) and the
 game's *Fisher* achievements (133, including ocean fishing) with progress for unfinished ones.
 
+- **Open in browser**: opens the tracker in your browser with its Import dialog filled in; nothing to copy or paste.
 - **Copy tracker link**: paste it into your browser; the [tracker](https://jadedzilla.github.io/of-dragons-deep/)
   opens its Import dialog with your fish and achievements filled in.
-  After copying, **Open in browser** opens that link straight away.
 - **Copy JSON**: the same data as one JSON string, to paste into the tracker's Import dialog or anywhere else.
 
-While the in-game **Fish Guide** is open, an **Export** button on its top-right corner offers the same two
+While the in-game **Fish Guide** is open, an **Export** button on its top-right corner offers the same
 choices (`...` opens the window). You can hide it with *Show export button on the Fish Guide*.
 
 Achievement progress (e.g. `312/500`) is asked from the server one achievement at a time, so the first

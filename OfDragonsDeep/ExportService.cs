@@ -8,8 +8,12 @@ namespace OfDragonsDeep;
 
 public enum ExportKind
 {
+    /// <summary>Copy the tracker link.</summary>
     Link,
+    /// <summary>Copy the JSON string.</summary>
     Json,
+    /// <summary>Open the tracker link in the browser (nothing is copied).</summary>
+    Open,
 }
 
 /// <summary>
@@ -25,9 +29,6 @@ public sealed class ExportService : IDisposable
     public DateTime StatusAt { get; private set; }
     public bool IsBusy => pending != null;
 
-    /// <summary>The last tracker link copied, so it can be opened in the browser.</summary>
-    public string? LastLink { get; private set; }
-
     /// <summary>Fish read during the last export or <see cref="RefreshFish"/>; null if unavailable.</summary>
     public List<FishEntry>? Fish { get; private set; }
 
@@ -39,13 +40,13 @@ public sealed class ExportService : IDisposable
 
     public void Dispose() => Plugin.PluginInterface.UiBuilder.Draw -= OnDraw;
 
+    /// <summary>Starts an export: copies the link or JSON, or opens the link, once everything is collected.</summary>
     public void Copy(ExportKind kind)
     {
         if (IsBusy)
             return;
         if (!Plugin.ClientState.IsLoggedIn)
         {
-            LastLink = null;
             SetStatus("Log in to a character first.");
             return;
         }
@@ -91,25 +92,27 @@ public sealed class ExportService : IDisposable
         }
 
         var achievements = tracker.Error == null && tracker.Entries.Count > 0 ? tracker.Entries : null;
-        var text = kind == ExportKind.Link
-            ? Exporter.TrackerLink(Fish, achievements)
-            : Exporter.ToJson(Fish, achievements);
-        ImGui.SetClipboardText(text);
-        if (kind == ExportKind.Link)
-            LastLink = text;
-
-        var what = kind == ExportKind.Link ? "Copied a tracker link" : "Copied JSON";
         var fishCount = Fish.Count(f => f.Caught);
-        SetStatus(achievements != null
-            ? $"{what} with {fishCount} fish and {achievements.Count(a => a.Complete)}/{achievements.Count} achievements."
-            : $"{what} with {fishCount} fish. Achievements couldn't be loaded, so they're not included.");
-    }
+        var contents = achievements != null
+            ? $"{fishCount} fish and {achievements.Count(a => a.Complete)}/{achievements.Count} achievements"
+            : $"{fishCount} fish";
+        var note = achievements != null ? "" : " Achievements couldn't be loaded, so they're not included.";
 
-    /// <summary>Opens the last copied tracker link in the default browser.</summary>
-    public void OpenLastLink()
-    {
-        if (LastLink != null)
-            Util.OpenLink(LastLink);
+        switch (kind)
+        {
+            case ExportKind.Open:
+                Util.OpenLink(Exporter.TrackerLink(Fish, achievements));
+                SetStatus($"Opened the tracker with {contents}.{note}");
+                break;
+            case ExportKind.Link:
+                ImGui.SetClipboardText(Exporter.TrackerLink(Fish, achievements));
+                SetStatus($"Copied a tracker link with {contents}.{note}");
+                break;
+            default:
+                ImGui.SetClipboardText(Exporter.ToJson(Fish, achievements));
+                SetStatus($"Copied JSON with {contents}.{note}");
+                break;
+        }
     }
 
     private void SetStatus(string text)

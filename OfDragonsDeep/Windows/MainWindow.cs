@@ -66,20 +66,18 @@ public sealed class MainWindow : Window
             ImGui.SetTooltip($"A link to {Exporter.TrackerUrl} that imports your fish and achievements.");
 
         ImGui.SameLine();
+        if (ImGui.Button("Open in browser"))
+            export.Copy(ExportKind.Open);
+        if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
+            ImGui.SetTooltip("Open the tracker with your fish and achievements ready to import.");
+
+        ImGui.SameLine();
         if (ImGui.Button("Copy JSON"))
             export.Copy(ExportKind.Json);
         if (ImGui.IsItemHovered(ImGuiHoveredFlags.AllowWhenDisabled))
             ImGui.SetTooltip("Your caught fish and achievements as one JSON string.");
         ImGui.EndDisabled();
 
-        if (export.LastLink != null)
-        {
-            ImGui.SameLine();
-            if (ImGui.Button("Open in browser"))
-                export.OpenLastLink();
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip("Open the tracker link you copied, to import it.");
-        }
 
         // Auto-resizing window: plain text (wrapped text would have no width to wrap to).
         if (export.Status.Length > 0)

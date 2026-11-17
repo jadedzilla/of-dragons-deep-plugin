@@ -72,6 +72,11 @@ public sealed class FishGuideOverlay : Window
 
         if (ImGui.BeginPopup("OfDragonsDeepExportMenu"))
         {
+            if (ImGui.Selectable("Open in browser"))
+                export.Copy(ExportKind.Open);
+            if (ImGui.IsItemHovered())
+                ImGui.SetTooltip("Open the tracker with your fish and achievements ready to import.");
+
             if (ImGui.Selectable("Copy tracker link"))
                 export.Copy(ExportKind.Link);
             if (ImGui.IsItemHovered())
@@ -79,9 +84,6 @@ public sealed class FishGuideOverlay : Window
 
             if (ImGui.Selectable("Copy JSON"))
                 export.Copy(ExportKind.Json);
-
-            if (export.LastLink != null && ImGui.Selectable("Open link in browser"))
-                export.OpenLastLink();
 
             ImGui.EndPopup();
         }
