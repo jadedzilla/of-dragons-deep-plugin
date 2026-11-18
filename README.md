@@ -20,7 +20,8 @@ exports the to a URL or JSON to import on the Of Dragons Deep website.
 | `/dragonsdeep` | Opens the window (also available from the plugin installer's "Open" button) |
 
 While the in-game **Fish Guide** is open, an **Export** button sits on its top-right corner (`...` opens
-the plugin window; hide the button with *Show export button on the Fish Guide*). The plugin window
+the plugin window; hide the buttons with *Show export button on the Fish Guide*). When fish have the green
+"new" dot, **Mark all seen** appears next to it and clears every dot at once. The plugin window
 (`/dragonsdeep`) shows your fishing log and fishing achievement totals and has the same **Export** button.
 
 Export opens a small window with a progress bar while it collects **everything at once**: your caught
