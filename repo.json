@@ -3,7 +3,7 @@
     "Author": "jadedzilla",
     "Name": "Of Dragons Deep",
     "InternalName": "OfDragonsDeep",
-    "AssemblyVersion": "1.0.1.0",
+    "AssemblyVersion": "1.0.2.0",
     "Punchline": "Exports the fish you have caught to the Of Dragons Deep website.",
     "Description": "Exports the fish you have caught to the Of Dragons Deep website.",
     "ApplicableVersion": "any",
@@ -16,13 +16,13 @@
     ],
     "DalamudApiLevel": 15,
     "IconUrl": "https://raw.githubusercontent.com/jadedzilla/of-dragons-deep-plugin/main/OfDragonsDeep/images/icon.png",
-    "Changelog": "Fish Guide: a Mark all seen button clears the green \"new\" dots from every fish at once.",
+    "Changelog": "Removes the Mark all seen button from 1.0.1, which could crash the game.",
     "IsHide": false,
     "IsTestingExclusive": false,
     "DownloadCount": 0,
-    "LastUpdate": 1795001027,
-    "DownloadLinkInstall": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.0.1/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.0.1/latest.zip",
-    "DownloadLinkTesting": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.0.1/latest.zip"
+    "LastUpdate": 1795001431,
+    "DownloadLinkInstall": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.0.2/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.0.2/latest.zip",
+    "DownloadLinkTesting": "https://github.com/jadedzilla/of-dragons-deep-plugin/releases/download/v1.0.2/latest.zip"
   }
 ]
