@@ -54,35 +54,8 @@ public sealed class FishGuideOverlay : Window
         ImGui.SetNextWindowPos(anchor, ImGuiCond.Always, new Vector2(1, 1));
     }
 
-    private string seenFeedback = string.Empty;
-    private DateTime seenFeedbackUntil;
-
     public override void Draw()
     {
-        if (DateTime.UtcNow < seenFeedbackUntil)
-        {
-            ImGui.AlignTextToFramePadding();
-            ImGui.TextUnformatted(seenFeedback);
-            ImGui.SameLine();
-        }
-
-        // Only while some fish still have the green "new" dot.
-        var unseen = UnseenFish.Count();
-        if (unseen > 0)
-        {
-            if (ImGui.Button("Mark all seen"))
-            {
-                var cleared = UnseenFish.MarkAllSeen();
-                seenFeedback = cleared == 1 ? "Cleared 1 new fish" : $"Cleared {cleared} new fish";
-                seenFeedbackUntil = DateTime.UtcNow.AddSeconds(3);
-            }
-            if (ImGui.IsItemHovered())
-                ImGui.SetTooltip(unseen == 1
-                    ? "Remove the green \"new\" dot from 1 fish without opening it."
-                    : $"Remove the green \"new\" dots from {unseen} fish without opening each one.");
-            ImGui.SameLine();
-        }
-
         if (ImGui.Button("Export"))
             plugin.ExportWindow.StartExport();
         if (ImGui.IsItemHovered())
