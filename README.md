@@ -3,7 +3,7 @@
 Exports the fish you have caught to the Of Dragons Deep website.
 
 It reads your **Fishing Log**, **Spearfishing Log**, and **Achievements** straight from game memory and
-exports every fish you've caught as text you can copy and paste into a web tracker.
+exports the to a URL or JSON to import on the Of Dragons Deep website.
 
 ## Installing
 
